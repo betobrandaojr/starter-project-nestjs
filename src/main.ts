@@ -1,12 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { EnvironmentLoaderService } from './shared/infra/utils/environment-load.service';
+import { EnvironmentLoaderService } from './shared/utils/environment-load.service';
 import { Logger } from '@nestjs/common';
-import { SwaggerService } from './shared/infra/utils/swagger.service';
+import { SwaggerService } from './shared/utils/swagger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
   const environmentLoaderService = app.get(EnvironmentLoaderService);
   const port = environmentLoaderService.getPort();
   SwaggerService.setup(app);

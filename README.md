@@ -37,7 +37,7 @@ $ yarn run test:cov
 
 ## Documentation
 
-Swagger [click here](http://localhost:3000/api-docs).
+Swagger [click here](http://localhost:3000/api).
 
 ## Suporte
 

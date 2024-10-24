@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -10,10 +10,13 @@ export class EnvironmentLoaderService {
   private validateEnvVariables(): void {
     const requiredVariables = [
       'PORT', //Start port
+      'DB_TYPE',
+      'DB_NAME',
       'DB_HOST',
       'DB_PORT',
       'DB_USER',
       'DB_PASSWORD',
+      'TYPEORM_SYNCHRONIZE',
     ];
 
     requiredVariables.forEach((variable) => {
@@ -22,6 +25,7 @@ export class EnvironmentLoaderService {
         throw new Error(`Missing environment variable: ${variable}`);
       }
     });
+    Logger.log(`## environment variables louders ##`);
   }
 
   public getEnvVariable(key: string): string {
