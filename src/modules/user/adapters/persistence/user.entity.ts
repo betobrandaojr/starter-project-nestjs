@@ -5,6 +5,9 @@ export class OrmUserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  customer_id: number;
+
   @Column({ name: 'user_name' })
   username: string;
 
@@ -13,9 +16,6 @@ export class OrmUserEntity {
 
   @Column()
   password: string;
-
-  @Column()
-  customer_id: number;
 
   @Column({ name: 'created_at' })
   createdAt: Date;

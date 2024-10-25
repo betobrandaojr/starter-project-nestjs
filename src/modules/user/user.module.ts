@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { CreateUseCase } from './use-cases/create.use-case';
-import { UserController } from './infra/controller/user.controller';
+import { FindOneUseCase } from './use-cases/find-one.use-case';
 
+//used in auth module
 @Module({
-  controllers: [UserController],
-  providers: [CreateUseCase],
+  controllers: [],
+  providers: [FindOneUseCase, FindOneUseCase],
+  exports: [FindOneUseCase],
 })
-export class UserModule {}
+export class UsersModule {}

@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EnvironmentLoaderService } from './shared/utils/environment-load.service';
 import { AuthModule } from './shared/auth/auth.module';
 import { DatabaseModule } from './shared/databases/database.module';
-import { UserModule } from './modules/user/user.module';
+import { HealthController } from './shared/utils/health.controller';
 
 @Module({
   imports: [
@@ -13,8 +13,8 @@ import { UserModule } from './modules/user/user.module';
     }),
     AuthModule,
     DatabaseModule,
-    UserModule,
   ],
+  controllers: [HealthController],
   providers: [EnvironmentLoaderService],
   exports: [EnvironmentLoaderService],
 })

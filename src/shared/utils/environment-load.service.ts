@@ -17,12 +17,15 @@ export class EnvironmentLoaderService {
       'DB_USER',
       'DB_PASSWORD',
       'TYPEORM_SYNCHRONIZE',
+      'JWT_SECRET',
     ];
-
     requiredVariables.forEach((variable) => {
       const value = this.configService.get(variable);
       if (!value) {
         throw new Error(`Missing environment variable: ${variable}`);
+      }
+      if (variable === 'JWT_SECRET' && value.length < 32) {
+        throw new Error('JWT_SECRET must be exactly 32 characters long');
       }
     });
     Logger.log(`## environment variables louders ##`);

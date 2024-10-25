@@ -3,16 +3,24 @@ import { AppModule } from './app.module';
 import { EnvironmentLoaderService } from './shared/utils/environment-load.service';
 import { Logger } from '@nestjs/common';
 import { SwaggerService } from './shared/utils/swagger.service';
+import * as dotenv from 'dotenv';
+import { NestFastifyApplication } from '@nestjs/platform-fastify';
+
+dotenv.config();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule);
   const environmentLoaderService = app.get(EnvironmentLoaderService);
   const port = environmentLoaderService.getPort();
   SwaggerService.setup(app);
 
-  await app.listen(port, () => {
+  await app.listen({ port }, (err, address) => {
+    if (err) {
+      Logger.error(err);
+      process.exit(1);
+    }
     Logger.log(
-      `## Application is running on: http://localhost:${port} in profile: ${process.env.NODE_ENV} ##`,
+      `## Application is running on: ${address} in profile: ${process.env.NODE_ENV} ##`,
     );
   });
 }
