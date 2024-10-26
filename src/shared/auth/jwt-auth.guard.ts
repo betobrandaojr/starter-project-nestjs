@@ -26,6 +26,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       request.user = payload;
       return true;
     } catch (error) {
+      if (error.code === 'ERR_JWT_EXPIRED') {
+        console.log('Token expired, generating new one');
+        const newToken = await this.authService.generateToken(error.payload);
+        const payload = await this.authService.validateToken(newToken);
+        request.user = payload;
+        return true;
+      }
       throw new UnauthorizedException('Invalid token');
     }
   }

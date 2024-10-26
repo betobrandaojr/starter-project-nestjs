@@ -26,12 +26,7 @@ export class AuthService {
 
       const payload = { sub: user.userId, username: user.username };
 
-      const createToken = await new EncryptJWT(payload)
-        .setProtectedHeader({ alg: 'dir', enc: 'A256GCM' })
-        .setIssuedAt()
-        .setExpirationTime(process.env.JWT_EXPIRES_IN || '8h')
-        .encrypt(this.secretKey);
-
+      const createToken = await this.generateToken(payload);
       return { access_token: createToken };
     } catch (error) {
       throw new UnauthorizedException('Invalid credentials');
@@ -43,7 +38,21 @@ export class AuthService {
       const { payload } = await jwtDecrypt(token, this.secretKey);
       return payload;
     } catch (error) {
+      if (error.code === 'ERR_JWT_EXPIRED') {
+        throw error;
+      }
       throw new UnauthorizedException('Invalid token');
     }
+  }
+
+  async generateToken(payload: {
+    sub: string;
+    username: string;
+  }): Promise<string> {
+    return await new EncryptJWT(payload)
+      .setProtectedHeader({ alg: 'dir', enc: 'A256GCM' })
+      .setIssuedAt()
+      .setExpirationTime('10s')
+      .encrypt(this.secretKey);
   }
 }
