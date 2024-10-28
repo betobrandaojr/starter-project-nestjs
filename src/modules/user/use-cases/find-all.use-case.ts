@@ -1,16 +1,22 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from '../entities/user';
+import { Inject, Injectable } from '@nestjs/common';
+import { USER_GATEWAY } from '../user.constant';
+import { UserGateway } from '../entities/user.gateway';
+import { UserFilterInput } from '../adapters/dto/user.input-dto';
+import { UserOutputDto } from '../adapters/dto/user.output-dto';
 
 @Injectable()
 export class FindAllUseCase {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @Inject(USER_GATEWAY)
+    private readonly userGateway: UserGateway,
   ) {}
 
-  async findAll(): Promise<User[]> {
-    return this.userRepository.find();
+  async findAll(filter?: UserFilterInput): Promise<UserOutputDto[]> {
+    try {
+      return await this.userGateway.findAll(filter);
+    } catch (error) {
+      console.log('Error in FindAllUseCase:', error);
+      throw new Error(error);
+    }
   }
 }

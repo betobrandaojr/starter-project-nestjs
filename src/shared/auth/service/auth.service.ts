@@ -3,6 +3,9 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { createSecretKey } from 'crypto';
 import { EncryptJWT, jwtDecrypt } from 'jose';
 import { FindOneUseCase } from 'src/modules/user/use-cases/find-one.use-case';
+import { Response } from 'express';
+import * as bcrypt from 'bcrypt';
+import { ERRORS } from 'src/shared/constants/errors';
 
 @Injectable()
 export class AuthService {
@@ -14,27 +17,21 @@ export class AuthService {
     );
   }
 
-  async signIn(
-    username: string,
-    pass: string,
-  ): Promise<{ access_token: string }> {
+  async signIn(response: Response, username: string, pass: string) {
     try {
       const user = await this.usersService.findOne(username);
-      if (user?.password !== pass) {
-        throw new UnauthorizedException();
+      const isMatch = await bcrypt.compare(pass, user.password);
+      if (!isMatch) {
+        throw new UnauthorizedException('Credenciais inválidas');
       }
 
-      const payload = { sub: user.userId, username: user.username };
-
-      const createToken = await new EncryptJWT(payload)
-        .setProtectedHeader({ alg: 'dir', enc: 'A256GCM' })
-        .setIssuedAt()
-        .setExpirationTime(process.env.JWT_EXPIRES_IN || '8h')
-        .encrypt(this.secretKey);
-
-      return { access_token: createToken };
+      const payload = { sub: user.id.toString(), username: user.username };
+      const createToken = await this.generateToken(payload);
+      return this.responseAutentication(response, {
+        access_token: createToken,
+      });
     } catch (error) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Credenciais inválidas');
     }
   }
 
@@ -43,7 +40,36 @@ export class AuthService {
       const { payload } = await jwtDecrypt(token, this.secretKey);
       return payload;
     } catch (error) {
+      if (error.code === ERRORS.JWT_EXPIRED) {
+        throw error;
+      }
       throw new UnauthorizedException('Invalid token');
     }
+  }
+
+  async generateToken(payload: {
+    sub: string;
+    username: string;
+  }): Promise<string> {
+    return await new EncryptJWT(payload)
+      .setProtectedHeader({ alg: 'dir', enc: 'A256GCM' })
+      .setIssuedAt()
+      .setExpirationTime('10s')
+      .encrypt(this.secretKey);
+  }
+
+  setCookiesToken(response: Response, token: string) {
+    response.cookie('token', token, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 30,
+    });
+  }
+
+  private responseAutentication(
+    response: Response,
+    data: { access_token: string },
+  ) {
+    this.setCookiesToken(response, data.access_token);
+    response.json(data);
   }
 }

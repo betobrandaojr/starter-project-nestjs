@@ -1,5 +1,6 @@
 import {
   Body,
+  Response,
   Controller,
   Post,
   HttpCode,
@@ -10,6 +11,7 @@ import { Throttle } from '@nestjs/throttler';
 import { AuthService } from '../service/auth.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthDto } from './dto/auth.dto';
+import { Response as ExpressResponse } from 'express';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -20,9 +22,13 @@ export class AuthController {
   @Throttle({ short: { limit: 2, ttl: 1000 }, long: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async signIn(@Body() signInDto: AuthDto) {
+  async signIn(
+    @Body() signInDto: AuthDto,
+    @Response() response: ExpressResponse,
+  ) {
     try {
       return await this.authService.signIn(
+        response,
         signInDto.username,
         signInDto.password,
       );

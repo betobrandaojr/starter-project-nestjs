@@ -13,7 +13,7 @@ export class User {
   constructor(private readonly userProps: UserProps) {
     this.validateUsername(userProps.username);
     this.validateEmail(userProps.email);
-    this.validatePassword(userProps.password);
+    // this.validatePassword(userProps.password);
   }
 
   public static create(
@@ -31,6 +31,27 @@ export class User {
       updatedAt: new Date(),
       deletedAt: null,
     });
+  }
+
+  public update(
+    customerId?: number,
+    username?: string,
+    email?: string,
+    password?: string,
+  ) {
+    if (customerId !== undefined) {
+      this.userProps.customerId = customerId;
+    }
+    if (username !== undefined) {
+      this.userProps.username = username;
+    }
+    if (email !== undefined) {
+      this.userProps.email = email;
+    }
+    if (password !== undefined) {
+      this.userProps.password = password;
+    }
+    this.userProps.updatedAt = new Date();
   }
 
   get id(): number {
@@ -53,6 +74,18 @@ export class User {
     return this.userProps.password;
   }
 
+  get createdAt(): Date {
+    return this.userProps.createdAt;
+  }
+
+  get updatedAt(): Date {
+    return this.userProps.updatedAt;
+  }
+
+  get deletedAt(): Date | null {
+    return this.userProps.deletedAt;
+  }
+
   private validateUsername(username: string) {
     if (username.length < 5 || username.length > 20) {
       throw new Error('Username is invalid');
@@ -65,9 +98,9 @@ export class User {
     }
   }
 
-  private validatePassword(password: string) {
-    if (password.length < 8 || password.length > 20) {
-      throw new Error('Password is invalid');
-    }
-  }
+  // private validatePassword(password: string) {
+  //   if (password.length < 8 || password.length > 20) {
+  //     throw new Error('Password is invalid');
+  //   }
+  // }
 }
