@@ -4,7 +4,7 @@ import { createSecretKey } from 'crypto';
 import { EncryptJWT, jwtDecrypt } from 'jose';
 import { FindOneUseCase } from 'src/modules/user/use-cases/find-one.use-case';
 import { Response } from 'express';
-//import { FastifyReply } from 'fastify';
+import * as bcrypt from 'bcrypt';
 import { ERRORS } from 'src/shared/constants/errors';
 
 @Injectable()
@@ -20,18 +20,18 @@ export class AuthService {
   async signIn(response: Response, username: string, pass: string) {
     try {
       const user = await this.usersService.findOne(username);
-      if (user?.password !== pass) {
-        throw new UnauthorizedException();
+      const isMatch = await bcrypt.compare(pass, user.password);
+      if (!isMatch) {
+        throw new UnauthorizedException('Credenciais inválidas');
       }
 
-      const payload = { sub: user.userId, username: user.username };
-
+      const payload = { sub: user.id.toString(), username: user.username };
       const createToken = await this.generateToken(payload);
       return this.responseAutentication(response, {
         access_token: createToken,
       });
     } catch (error) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Credenciais inválidas');
     }
   }
 

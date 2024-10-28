@@ -4,6 +4,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './service/auth.service';
 import { AuthController } from './presentation/auth.controller';
 import { UsersModule } from 'src/modules/user/user.module';
+import { BcryptPasswordHasher } from '../utils/bcrypt-password-hasher.service';
+import { FindOneUseCase } from 'src/modules/user/use-cases/find-one.use-case';
 
 @Module({
   imports: [
@@ -20,7 +22,7 @@ import { UsersModule } from 'src/modules/user/user.module';
       }),
     }),
   ],
-  providers: [AuthService],
+  providers: [AuthService, BcryptPasswordHasher, FindOneUseCase],
   controllers: [AuthController],
   exports: [AuthService],
 })

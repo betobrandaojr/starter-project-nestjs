@@ -1,22 +1,21 @@
-import { Injectable } from '@nestjs/common';
-
-export type User = any;
+import { Inject, Injectable } from '@nestjs/common';
+import { USER_GATEWAY } from '../user.constant';
+import { UserGateway } from '../entities/user.gateway';
+import { User } from '../entities/user';
 
 @Injectable()
 export class FindOneUseCase {
-  private readonly users = [
-    {
-      userId: 1,
-      username: 'Beto',
-      password: '1234',
-    },
-  ];
+  constructor(
+    @Inject(USER_GATEWAY)
+    private readonly userGateway: UserGateway,
+  ) {}
 
-  async findOne(username: string): Promise<User | undefined> {
+  async findOne(username: string): Promise<User> {
     try {
-      return this.users.find((user) => user.username === username);
+      return await this.userGateway.findOne(username);
     } catch (error) {
-      throw console.error(error);
+      console.log('Error in FindOneUseCase:', error);
+      throw new Error(error);
     }
   }
 }
