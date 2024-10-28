@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { EnvironmentLoaderService } from './shared/utils/environment-load.service';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerService } from './shared/utils/swagger.service';
 import * as dotenv from 'dotenv';
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
@@ -17,6 +17,7 @@ async function bootstrap() {
   });
   const environmentLoaderService = app.get(EnvironmentLoaderService);
   const port = environmentLoaderService.getPort();
+  app.useGlobalPipes(new ValidationPipe());
   SwaggerService.setup(app);
 
   await app.listen({ port }, (err, address) => {

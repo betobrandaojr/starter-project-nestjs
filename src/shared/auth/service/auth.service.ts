@@ -4,6 +4,7 @@ import { createSecretKey } from 'crypto';
 import { EncryptJWT, jwtDecrypt } from 'jose';
 import { FindOneUseCase } from 'src/modules/user/use-cases/find-one.use-case';
 import { Response } from 'express';
+//import { FastifyReply } from 'fastify';
 import { ERRORS } from 'src/shared/constants/errors';
 
 @Injectable()

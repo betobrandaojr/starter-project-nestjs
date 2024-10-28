@@ -53,6 +53,18 @@ export class User {
     return this.userProps.password;
   }
 
+  get createdAt(): Date {
+    return this.userProps.createdAt;
+  }
+
+  get updatedAt(): Date {
+    return this.userProps.updatedAt;
+  }
+
+  get deletedAt(): Date | null {
+    return this.userProps.deletedAt;
+  }
+
   private validateUsername(username: string) {
     if (username.length < 5 || username.length > 20) {
       throw new Error('Username is invalid');
